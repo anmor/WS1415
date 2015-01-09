@@ -1,8 +1,12 @@
+package application;
+	
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.HashMap;
+import javafx.util.Pair;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -133,7 +137,8 @@ public class GUIController implements Initializable {
 
 		//-- Array mit Werten fuellen. --
 		String inhalte[][] = new String[hoehe][breite];
-		inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte);
+		HashMap<Pair<Integer,String>, Integer> datenwerte = new HashMap<Pair<Integer,String>, Integer>();
+		inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, datenwerte, waren, daten);
 
 		//- Testausgabe -
 		int a = 0;
@@ -148,6 +153,13 @@ public class GUIController implements Initializable {
 		a++; // wegen nullten Eintrag.
 		System.out.println("Es gibt " + a + " Eintraege.");
 
+	    for( Pair name: datenwerte.keySet() )
+	    {
+	       System.out.println(name.getKey() + ": "+name.getValue() + ": "+ datenwerte.get(name));    
+	    }
+	    Double minSup = new Double(0.05);
+	    Double minConf = new Double(0.50);
+	    inhalt.apriori(inhalte,minSup,minConf,hoehe,waren);
 	}
 
 }
