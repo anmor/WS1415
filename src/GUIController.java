@@ -2,12 +2,13 @@ package application;
 	
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.HashMap;
-import javafx.util.Pair;
 
+import javafx.util.Pair;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -130,20 +131,31 @@ public class GUIController implements Initializable {
 		//-- Hoehe/Breite/Daten/Waren ermitteln --
 		int groessen[] = inhalt.hoehebreite(dateiinhalt);
 		int waren = 0, daten = 0, hoehe = 0, breite = 0;
+		int hoeheTatsaechlich = 0;
 		hoehe = groessen[0];
 		breite = groessen[1];
 		waren = groessen[2];
 		daten = groessen[3];
 
+		LinkedList<HashMap<String, Integer>> datenWerte = new LinkedList<HashMap<String, Integer>>();
+		datenWerte = inhalt.datenErmitteln(dateiinhalt, breite, waren, daten);
+
+	    for (int i = 0;i < datenWerte.size(); i++) 
+	    {
+		    for( String wert: datenWerte.get(i).keySet() )
+		    {
+		       System.out.println(i + " " + wert + " "+ datenWerte.get(i).get(wert));    
+		    }
+	    }
+		
 		//-- Array mit Werten fuellen. --
 		String inhalte[][] = new String[hoehe][breite];
-		HashMap<Pair<Integer,String>, Integer> datenwerte = new HashMap<Pair<Integer,String>, Integer>();
-		inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, datenwerte, waren, daten);
+		hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten,0,"Male");
 
 		//- Testausgabe -
 		int a = 0;
 		System.out.println("Elemente im Array: ");
-		for (int i = 0; i < hoehe; i++) {
+		for (int i = 0; i < hoeheTatsaechlich; i++) {
 			for (int j = 0; j < breite; j++) {
 				System.out.print(inhalte[i][j] + " ");
 			}
@@ -153,13 +165,10 @@ public class GUIController implements Initializable {
 		a++; // wegen nullten Eintrag.
 		System.out.println("Es gibt " + a + " Eintraege.");
 
-	    for( Pair name: datenwerte.keySet() )
-	    {
-	       System.out.println(name.getKey() + ": "+name.getValue() + ": "+ datenwerte.get(name));    
-	    }
-	    Double minSup = new Double(0.05);
+	    Double minSup = new Double(0.20);
 	    Double minConf = new Double(0.50);
-	    inhalt.apriori(inhalte,minSup,minConf,hoehe,waren);
+		LinkedList<LinkedList<LinkedList<Integer>>> regeln = new LinkedList<LinkedList<LinkedList<Integer>>>();
+	    regeln = inhalt.apriori(inhalte,minSup,minConf,hoeheTatsaechlich,waren);
 	}
 
 }
