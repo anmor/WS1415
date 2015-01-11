@@ -91,6 +91,22 @@ public class GUIController implements Initializable {
 		waren = groessen[2];
 		daten = groessen[3];
 
+		LinkedList<String> warenNamen = new LinkedList<String>();
+		warenNamen = inhalt.warenNamenErmitteln(dateiinhalt, breite, waren, daten);
+
+		LinkedList<String> datenNamen = new LinkedList<String>();
+		datenNamen = inhalt.datenNamenErmitteln(dateiinhalt, breite, waren, daten);
+
+		LinkedList<HashMap<String, Integer>> datenWerte = new LinkedList<HashMap<String, Integer>>();
+		datenWerte = inhalt.datenErmitteln(dateiinhalt, breite, waren, daten);
+		
+	    for (int i = 0;i < datenWerte.size(); i++) 
+	    {
+		    for( String wert: datenWerte.get(i).keySet() )
+		    {
+		       System.out.println(datenNamen.get(i) + " " + wert + " "+ datenWerte.get(i).get(wert));    
+		    }
+	    }
 		//- Testausgabe -
 		System.out.println("Waren: " + waren);
 		System.out.println("Daten: " + daten);
@@ -137,17 +153,6 @@ public class GUIController implements Initializable {
 		waren = groessen[2];
 		daten = groessen[3];
 
-		LinkedList<HashMap<String, Integer>> datenWerte = new LinkedList<HashMap<String, Integer>>();
-		datenWerte = inhalt.datenErmitteln(dateiinhalt, breite, waren, daten);
-
-	    for (int i = 0;i < datenWerte.size(); i++) 
-	    {
-		    for( String wert: datenWerte.get(i).keySet() )
-		    {
-		       System.out.println(i + " " + wert + " "+ datenWerte.get(i).get(wert));    
-		    }
-	    }
-		
 		//-- Array mit Werten fuellen. --
 		String inhalte[][] = new String[hoehe][breite];
 		hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten,0,"Male");

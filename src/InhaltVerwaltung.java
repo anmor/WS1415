@@ -227,6 +227,68 @@ public class InhaltVerwaltung {
 		return regeln;
 	}
 
+	//--- Ermittle die Daten Ueberschriften
+	public LinkedList<String> datenNamenErmitteln(List<String> dateiinhalt, int breite, int waren, int daten) {
+		LinkedList<String> datenNamen = new LinkedList<String>();
+
+		int vertikal = 0, fehlerhaft = 0;
+
+		String vorzeile = "";
+		//-- Inhalte pruefen und uebergben --
+		for (String information : dateiinhalt) {
+
+			//- Betrachte nur die gefuellten Zeilen mit Dateninhalten.  -
+			if (information.startsWith("0,") || information.startsWith("1,")) {
+				String x[] = vorzeile.split(",");
+
+				//- Pruefe ob der Datensatz vollst�ndig ist. -
+				if (x.length != breite) {
+					System.out.println(information);
+					System.out.println("Falscher Datensatz");
+					fehlerhaft++;
+				} else {
+					for (int horizontal = waren; horizontal < breite; horizontal++) {
+						datenNamen.add(x[horizontal]);
+					}
+					return datenNamen;
+				}
+			}
+			vorzeile = information;
+		}
+		return datenNamen;
+	}
+
+	//--- Ermittle die Waren Ueberschriften
+	public LinkedList<String> warenNamenErmitteln(List<String> dateiinhalt, int breite, int waren, int daten) {
+		LinkedList<String> warenNamen = new LinkedList<String>();
+
+		int vertikal = 0, fehlerhaft = 0;
+
+		String vorzeile = "";
+		//-- Inhalte pruefen und uebergben --
+		for (String information : dateiinhalt) {
+
+			//- Betrachte nur die gefuellten Zeilen mit Dateninhalten.  -
+			if (information.startsWith("0,") || information.startsWith("1,")) {
+				String x[] = vorzeile.split(",");
+
+				//- Pruefe ob der Datensatz vollst�ndig ist. -
+				if (x.length != breite) {
+					System.out.println(information);
+					System.out.println("Falscher Datensatz");
+					fehlerhaft++;
+				} else {
+					for (int horizontal = 0; horizontal < waren; horizontal++) {
+						warenNamen.add(x[horizontal]);
+					}
+					return warenNamen;
+				}
+			}
+			vorzeile = information;
+		}
+		return warenNamen;
+	}
+
 	//--- Ermittle die moeglichen Werte in den Datenfeldern ---
 	public LinkedList<HashMap<String, Integer>> datenErmitteln(List<String> dateiinhalt, int breite, int waren, int daten) {
 		LinkedList<HashMap<String, Integer>> datenWerte = new LinkedList<HashMap<String, Integer>>();
