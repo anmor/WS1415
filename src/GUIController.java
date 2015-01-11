@@ -1,20 +1,21 @@
-package application;
-	
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.HashMap;
 
-import javafx.util.Pair;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -30,7 +31,13 @@ public class GUIController implements Initializable {
 
 	@Override
 	public void initialize(URL arg0, ResourceBundle arg1) {
-
+		ObservableList<Double> list = FXCollections.observableArrayList();
+		for (double i = 0.00; i <= 1.00; i += 0.01) {
+			i = Math.rint(i * 100) / 100;
+			list.add(i);
+		}
+		minSup.setItems(list);
+		minConf.setItems(list);
 	}
 
 	@FXML
@@ -47,6 +54,12 @@ public class GUIController implements Initializable {
 
 	@FXML
 	private TableView tabelle;
+
+	@FXML
+	private ListView<String> regelListe;
+
+	@FXML
+	private ComboBox<Double> minSup, minConf;
 
 	@FXML
 	private BarChart<?, ?> diagramm;
@@ -96,16 +109,14 @@ public class GUIController implements Initializable {
 
 		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
 		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
-		
-	    for (int i = 0;i < werte.size(); i++) 
-	    {
-		    for( String wert: werte.get(i).keySet() )
-		    {
-		       System.out.println(namen.get(i) + " " + wert + " "+ werte.get(i).get(wert));    
-		    }
-	    }
 
-	    //- Testausgabe -
+		for (int i = 0; i < werte.size(); i++) {
+			for (String wert : werte.get(i).keySet()) {
+				System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
+			}
+		}
+
+		//- Testausgabe -
 		System.out.println("Waren: " + waren);
 		System.out.println("Daten: " + daten);
 		System.out.println("Hoehe = " + hoehe + " Breite = " + breite);
@@ -125,6 +136,8 @@ public class GUIController implements Initializable {
 			tabelle.setItems(inhalt.tabellenInhalt(dateiinhalt, breite));
 		}
 		// auswertung.setDisable(false); // nullpointer warum?
+
+		//minSup.setItems(FXCollections.observableArrayList());
 	}
 
 	@FXML
@@ -153,25 +166,63 @@ public class GUIController implements Initializable {
 
 		//-- Array mit Werten fuellen. --
 		String inhalte[][] = new String[hoehe][breite];
-		hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten,0,"Male");
+		hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, 0, "Male");
+		//hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten,-1,"");
+
+		LinkedList<String> namen = new LinkedList<String>();
+		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
+
+		namen = inhalt.namenErmitteln(dateiinhalt, breite);
+		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
+
+		for (int i = daten; i <= breite; i++) {
+			for (String wert : werte.get(i).keySet()) {
+				System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
+			}
+
+		}
 
 		//- Testausgabe -
-		int a = 0;
-		System.out.println("Elemente im Array: ");
-		for (int i = 0; i < hoeheTatsaechlich; i++) {
-			for (int j = 0; j < breite; j++) {
-				System.out.print(inhalte[i][j] + " ");
-			}
-			System.out.println("");
-			a = i;
-		}
-		a++; // wegen nullten Eintrag.
-		System.out.println("Es gibt " + a + " Eintraege.");
+		//		int a = 0;
+		//		System.out.println("Elemente im Array: ");
+		//		for (int i = 0; i < hoeheTatsaechlich; i++) {
+		//			for (int j = 0; j < breite; j++) {
+		//				System.out.print(inhalte[i][j] + " ");
+		//			}
+		//			System.out.println("");
+		//			a = i;
+		//		}
+		//		a++; // wegen nullten Eintrag.
+		//		System.out.println("Es gibt " + a + " Eintraege.");
 
-	    Double minSup = new Double(0.20);
-	    Double minConf = new Double(0.50);
+		//- Sup und Conf Werte zuweisen -
+		Double minSupWert = new Double(0.20);
+		Double minConfWert = new Double(0.50);
+
+		if (minSup.getValue() != null) {
+			minSupWert = (Double) minSup.getValue();
+		}
+		if (minConf.getValue() != null) {
+			minConfWert = (Double) minConf.getValue();
+		}
+
+		//- Testausgabe -
+		System.out.println("MinSup: " + minSupWert + " und MinConf: " + minConfWert);
+
+		//--- Regeln auf den Datensatz anwenden ---
 		LinkedList<LinkedList<LinkedList<Integer>>> regeln = new LinkedList<LinkedList<LinkedList<Integer>>>();
-	    regeln = inhalt.apriori(inhalte,minSup,minConf,hoeheTatsaechlich,waren);
+		regeln = inhalt.apriori(inhalte, minSupWert, minConfWert, hoeheTatsaechlich, waren);
+
+		//-- Liste der gefundenen Regeln darstellen -- 
+		ObservableList<String> rListe = FXCollections.observableArrayList();
+		rListe.add("Anhand der Einstellungen treffen " + regeln.size() + " Regeln zu.");
+		for (int i = 0; i < regeln.size(); i++) {
+			double conf = ((double) regeln.get(i).get(3).get(0) / (double) regeln.get(i).get(2).get(0));
+			conf = Math.round(conf * 100);
+			rListe.add(regeln.get(i).get(0) + " -> " + regeln.get(i).get(1) + " Sup: " + regeln.get(i).get(3).get(0) + " Conf: " + conf / 100);
+		}
+		regelListe.setItems(rListe);
+
 	}
 
 }
