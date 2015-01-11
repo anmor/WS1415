@@ -219,7 +219,27 @@ public class GUIController implements Initializable {
 		for (int i = 0; i < regeln.size(); i++) {
 			double conf = ((double) regeln.get(i).get(3).get(0) / (double) regeln.get(i).get(2).get(0));
 			conf = Math.round(conf * 100);
-			rListe.add(regeln.get(i).get(0) + " -> " + regeln.get(i).get(1) + " Sup: " + regeln.get(i).get(3).get(0) + " Conf: " + conf / 100);
+			double sup = ((double) regeln.get(i).get(3).get(0) / (double) hoeheTatsaechlich);
+			sup = Math.round(sup * 100);
+			String rListeString = new String("Sup: " + sup / 100);
+			if (sup%10==0) {
+				rListeString = rListeString + "0";				
+			}
+			rListeString = rListeString + " Conf: " + conf / 100;
+			if (conf%10==0) {
+				rListeString = rListeString + "0";				
+			}
+			rListeString = rListeString + " [ ";
+			for (int j = 0;j < regeln.get(i).get(0).size();j++) {
+				rListeString = rListeString + "'" + namen.get(regeln.get(i).get(0).get(j)) + "' ";
+			}
+			rListeString = rListeString + "] -> [ ";
+			for (int j = 0;j < regeln.get(i).get(1).size();j++) {
+				rListeString = rListeString + "'" + namen.get(regeln.get(i).get(1).get(j)) + "' ";
+			}
+			rListeString = rListeString + "]";
+			rListe.add(rListeString);
+//			rListe.add(regeln.get(i).get(0) + " -> " + regeln.get(i).get(1) + " Sup: " + sup / 100  + " Conf: " + conf / 100);
 		}
 		regelListe.setItems(rListe);
 

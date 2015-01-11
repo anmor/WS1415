@@ -18,12 +18,12 @@ import javafx.collections.ObservableList;
 
 public class InhaltVerwaltung {
 
-	public LinkedList<LinkedList<LinkedList<Integer>>> apriori(String inhalte[][], double minSup, double minConf, int hoehe, int waren) {
+	public LinkedList<LinkedList<LinkedList<Integer>>> apriori(String inhalte[][], double minSup, double minConf, int hoeheTatsaechlich, int waren) {
 		int itemcount[] = new int[waren];
 		for (int j = 0; j < waren; j++) {
 			itemcount[j] = 0;
 		}
-		for (int i = 0; i < hoehe; i++) {
+		for (int i = 0; i < hoeheTatsaechlich; i++) {
 			for (int j = 0; j < waren; j++) {
 				if (inhalte[i][j].equals(String.valueOf(1))) {
 					itemcount[j]++;
@@ -37,7 +37,7 @@ public class InhaltVerwaltung {
 
 		Double sup = new Double(0);
 		for (int j = 0; j < waren; j++) {
-			sup = ((double) itemcount[j] / (double) hoehe);
+			sup = ((double) itemcount[j] / (double) hoeheTatsaechlich);
 			if (sup >= minSup) {
 				kandidaten.get(0).add(new LinkedList<Integer>());
 				kandidatenSup.get(0).add(itemcount[j]);
@@ -104,7 +104,7 @@ public class InhaltVerwaltung {
 			}
 			/* Kandidaten Generierung beendet */
 			/* zaehlen */
-			for (int i = 0; i < hoehe; i++) {
+			for (int i = 0; i < hoeheTatsaechlich; i++) {
 				for (int j = 0; j < kandidaten.getLast().size(); j++) {
 					boolean matches = true;
 					int k = 0;
@@ -121,7 +121,7 @@ public class InhaltVerwaltung {
 				}
 			}
 			for (int j = 0; j < kandidaten.getLast().size(); j++) {
-				sup = ((double) kandidatenSup.getLast().get(j) / (double) hoehe);
+				sup = ((double) kandidatenSup.getLast().get(j) / (double) hoeheTatsaechlich);
 				if (sup < minSup) {
 					//					System.out.println(kandidaten.getLast().get(j) + " ist kein Frequent Itemset");
 					kandidaten.getLast().remove(j);
@@ -165,10 +165,14 @@ public class InhaltVerwaltung {
 					regeln.add(new LinkedList<LinkedList<Integer>>());
 					anzahlRegeln++;
 					regeln.getLast().add(new LinkedList<Integer>());
+					boolean einsortiert = false;
 					for (int k = 0; k < regeln.get(i).get(0).size(); k++) {
+						if (regeln.get(i).get(1).get(j)<regeln.get(i).get(0).get(k) & !einsortiert) {
+							regeln.getLast().getLast().add(regeln.get(i).get(1).get(j));
+							einsortiert=true;
+						}
 						regeln.getLast().getLast().add(regeln.get(i).get(0).get(k));
 					}
-					regeln.getLast().getLast().add(regeln.get(i).get(1).get(j));
 					regeln.getLast().add(new LinkedList<Integer>());
 					for (int k = 0; k < regeln.get(i).get(1).size(); k++) {
 						if (j != k) {
