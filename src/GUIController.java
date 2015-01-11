@@ -91,23 +91,21 @@ public class GUIController implements Initializable {
 		waren = groessen[2];
 		daten = groessen[3];
 
-		LinkedList<String> warenNamen = new LinkedList<String>();
-		warenNamen = inhalt.warenNamenErmitteln(dateiinhalt, breite, waren, daten);
+		LinkedList<String> namen = new LinkedList<String>();
+		namen = inhalt.namenErmitteln(dateiinhalt, breite);
 
-		LinkedList<String> datenNamen = new LinkedList<String>();
-		datenNamen = inhalt.datenNamenErmitteln(dateiinhalt, breite, waren, daten);
-
-		LinkedList<HashMap<String, Integer>> datenWerte = new LinkedList<HashMap<String, Integer>>();
-		datenWerte = inhalt.datenErmitteln(dateiinhalt, breite, waren, daten);
+		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
+		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
 		
-	    for (int i = 0;i < datenWerte.size(); i++) 
+	    for (int i = 0;i < werte.size(); i++) 
 	    {
-		    for( String wert: datenWerte.get(i).keySet() )
+		    for( String wert: werte.get(i).keySet() )
 		    {
-		       System.out.println(datenNamen.get(i) + " " + wert + " "+ datenWerte.get(i).get(wert));    
+		       System.out.println(namen.get(i) + " " + wert + " "+ werte.get(i).get(wert));    
 		    }
 	    }
-		//- Testausgabe -
+
+	    //- Testausgabe -
 		System.out.println("Waren: " + waren);
 		System.out.println("Daten: " + daten);
 		System.out.println("Hoehe = " + hoehe + " Breite = " + breite);

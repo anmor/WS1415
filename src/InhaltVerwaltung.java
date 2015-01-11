@@ -227,9 +227,9 @@ public class InhaltVerwaltung {
 		return regeln;
 	}
 
-	//--- Ermittle die Daten Ueberschriften
-	public LinkedList<String> datenNamenErmitteln(List<String> dateiinhalt, int breite, int waren, int daten) {
-		LinkedList<String> datenNamen = new LinkedList<String>();
+	//--- Ermittle die Ueberschriften
+	public LinkedList<String> namenErmitteln(List<String> dateiinhalt, int breite) {
+		LinkedList<String> namen = new LinkedList<String>();
 
 		int vertikal = 0, fehlerhaft = 0;
 
@@ -247,53 +247,23 @@ public class InhaltVerwaltung {
 					System.out.println("Falscher Datensatz");
 					fehlerhaft++;
 				} else {
-					for (int horizontal = waren; horizontal < breite; horizontal++) {
-						datenNamen.add(x[horizontal]);
+					for (int horizontal = 0; horizontal < breite; horizontal++) {
+						namen.add(x[horizontal]);
 					}
-					return datenNamen;
+					namen.add("Warensumme");
+					return namen;
 				}
 			}
 			vorzeile = information;
 		}
-		return datenNamen;
+		return namen;
 	}
 
-	//--- Ermittle die Waren Ueberschriften
-	public LinkedList<String> warenNamenErmitteln(List<String> dateiinhalt, int breite, int waren, int daten) {
-		LinkedList<String> warenNamen = new LinkedList<String>();
-
-		int vertikal = 0, fehlerhaft = 0;
-
-		String vorzeile = "";
-		//-- Inhalte pruefen und uebergben --
-		for (String information : dateiinhalt) {
-
-			//- Betrachte nur die gefuellten Zeilen mit Dateninhalten.  -
-			if (information.startsWith("0,") || information.startsWith("1,")) {
-				String x[] = vorzeile.split(",");
-
-				//- Pruefe ob der Datensatz vollst�ndig ist. -
-				if (x.length != breite) {
-					System.out.println(information);
-					System.out.println("Falscher Datensatz");
-					fehlerhaft++;
-				} else {
-					for (int horizontal = 0; horizontal < waren; horizontal++) {
-						warenNamen.add(x[horizontal]);
-					}
-					return warenNamen;
-				}
-			}
-			vorzeile = information;
-		}
-		return warenNamen;
-	}
-
-	//--- Ermittle die moeglichen Werte in den Datenfeldern ---
-	public LinkedList<HashMap<String, Integer>> datenErmitteln(List<String> dateiinhalt, int breite, int waren, int daten) {
-		LinkedList<HashMap<String, Integer>> datenWerte = new LinkedList<HashMap<String, Integer>>();
-		for (int i = 0; i < daten; i++) {
-			datenWerte.add(new HashMap<String, Integer>());
+	//--- Ermittle die moeglichen Werte in den Feldern und zaehle Sie---
+	public LinkedList<HashMap<String, Integer>> werteErmitteln(List<String> dateiinhalt, int breite, int waren) {
+		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
+		for (int i = 0; i < breite+1; i++) {
+			werte.add(new HashMap<String, Integer>());
 		}
 
 		int vertikal = 0, fehlerhaft = 0;
@@ -311,18 +281,29 @@ public class InhaltVerwaltung {
 					System.out.println("Falscher Datensatz");
 					fehlerhaft++;
 				} else {
-					for (int horizontal = waren; horizontal < breite; horizontal++) {
-						if (datenWerte.get(horizontal-waren).containsKey(x[horizontal])) {
-							datenWerte.get(horizontal-waren).put(x[horizontal], datenWerte.get(horizontal-waren).get(x[horizontal])+1);							
+					int warensumme = 0;
+					for (int horizontal = 0; horizontal < breite; horizontal++) {
+						if (werte.get(horizontal).containsKey(x[horizontal])) {
+							werte.get(horizontal).put(x[horizontal], werte.get(horizontal).get(x[horizontal])+1);							
 						} else {
-							datenWerte.get(horizontal-waren).put(x[horizontal], 1);							
+							werte.get(horizontal).put(x[horizontal], 1);							
 						}
+						if (horizontal < waren) {
+							if (x[horizontal].equals("1")) {
+								warensumme = warensumme + 1;
+							}
+						}
+					}
+					if (werte.get(breite).containsKey(((Integer) warensumme).toString())) {
+						werte.get(breite).put(((Integer) warensumme).toString(), werte.get(breite).get(((Integer) warensumme).toString())+1);							
+					} else {
+						werte.get(breite).put(((Integer) warensumme).toString(), 1);							
 					}
 					vertikal++;
 				}
 			}
 		}
-		return datenWerte;
+		return werte;
 	}
 
 	//--- Inhalte in ein zweidimensionales Array speichern ---
