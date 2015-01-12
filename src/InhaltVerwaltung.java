@@ -167,9 +167,9 @@ public class InhaltVerwaltung {
 					regeln.getLast().add(new LinkedList<Integer>());
 					boolean einsortiert = false;
 					for (int k = 0; k < regeln.get(i).get(0).size(); k++) {
-						if (regeln.get(i).get(1).get(j)<regeln.get(i).get(0).get(k) & !einsortiert) {
+						if (regeln.get(i).get(1).get(j) < regeln.get(i).get(0).get(k) & !einsortiert) {
 							regeln.getLast().getLast().add(regeln.get(i).get(1).get(j));
-							einsortiert=true;
+							einsortiert = true;
 						}
 						regeln.getLast().getLast().add(regeln.get(i).get(0).get(k));
 					}
@@ -321,7 +321,7 @@ public class InhaltVerwaltung {
 					fehlerhaft++;
 				} else {
 					boolean nutzeDatensatz = true;
-					if (filterFeld > -1 & filterFeld < daten) {
+					if (filterFeld > -1 & filterFeld < daten) { // ist das so richtig?? A.M.
 						if (!x[waren + filterFeld].equals(filterWert)) {
 							nutzeDatensatz = false;
 						}
@@ -335,7 +335,6 @@ public class InhaltVerwaltung {
 				}
 			}
 		}
-		//		System.out.println("Es gibt " + fehlerhaft + " fehlerhafte Dateninhalte.");
 		System.out.println(vertikal + " Datensaetze wurden uebergeben.");
 		return vertikal;
 	}
@@ -384,8 +383,6 @@ public class InhaltVerwaltung {
 			//- Betrachte nur die mit Attributen gefuellten Zeilen -
 			if (information.startsWith("0") || information.startsWith("1")) {
 				hoehe++;
-				//				//- Testausgabe -
-				//				System.out.println(information);
 			}
 		}
 		groessen[0] = hoehe;
@@ -415,8 +412,6 @@ public class InhaltVerwaltung {
 				//- Leere Zeilen werden nicht gespeichert. -
 				if (output.trim().equals("") == false) {
 					dateiinhalt.add(output);
-					//					//- Testausgabe -
-					//					System.out.println(output);
 				}
 			}
 			input.close();

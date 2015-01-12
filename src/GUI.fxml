@@ -38,9 +38,42 @@
                      </children></AnchorPane>
                </content>
             </Tab>
-            <Tab text="Einstellungen">
+            <Tab text="Statistik">
                <content>
                   <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <SplitPane dividerPositions="0.2550335570469799" prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                           <items>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0" SplitPane.resizableWithParent="false">
+                                 <children>
+                                    <VBox fx:id="box1" minWidth="-Infinity" prefHeight="194.0" prefWidth="149.0" AnchorPane.bottomAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                       <children>
+                                          <ComboBox fx:id="kategorie" prefWidth="150.0" promptText="Kategorie wählen" />
+                                          <Button fx:id="statistikausgabe" alignment="BOTTOM_LEFT" mnemonicParsing="false" onAction="#statistik" prefHeight="25.0" prefWidth="149.0" text="Statistik anzeigen" />
+                                       </children>
+                                    </VBox>
+                                 </children>
+                              </AnchorPane>
+                              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
+                                 <children>
+                                    <BarChart fx:id="diagramm" depthTest="ENABLE" legendSide="TOP" nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                      <xAxis>
+                                        <CategoryAxis animated="false" cacheShape="false" focusTraversable="true" scaleShape="false" />
+                                      </xAxis>
+                                      <yAxis>
+                                        <NumberAxis fx:id="yAxe" />
+                                      </yAxis>
+                                    </BarChart>
+                                 </children>
+                              </AnchorPane>
+                           </items>
+                        </SplitPane>
+                     </children></AnchorPane>
+               </content>
+            </Tab>
+            <Tab text="Einstellungen und Regeln">
+              <content>
+                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
                         <SplitPane dividerPositions="0.2550335570469799" prefHeight="196.0" prefWidth="598.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                           <items>
@@ -52,6 +85,8 @@
                                           <ComboBox fx:id="minSup" prefWidth="150.0" promptText="0.2" />
                                           <Label alignment="CENTER" prefHeight="17.0" prefWidth="149.0" text="minConf" />
                                           <ComboBox fx:id="minConf" prefWidth="150.0" promptText="0.5" />
+                                          <Label alignment="CENTER" prefHeight="17.0" prefWidth="149.0" text="Einschränkung" />
+                                          <ComboBox fx:id="limitierung" prefWidth="150.0" promptText="Auswahl" />
                                           <Button fx:id="algorithmus" mnemonicParsing="false" onAction="#auswerten" prefHeight="25.0" prefWidth="149.0" text="Auswertung" />
                                        </children>
                                     </VBox>
@@ -59,33 +94,13 @@
                               </AnchorPane>
                             <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                  <children>
-                                    <BarChart fx:id="diagramm" layoutX="-164.0" layoutY="-138.0" prefHeight="194.0" prefWidth="441.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-                                      <xAxis>
-                                        <CategoryAxis side="BOTTOM" />
-                                      </xAxis>
-                                      <yAxis>
-                                        <NumberAxis side="LEFT" />
-                                      </yAxis>
-                                    </BarChart>
+                                    <ListView fx:id="regelListe" prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
                                  </children>
                               </AnchorPane>
                           </items>
                         </SplitPane>
                      </children></AnchorPane>
-               </content>
-            </Tab>
-            <Tab text="Übersicht der Regel">
-              <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <ListView fx:id="regelListe" layoutX="70.0" layoutY="32.0" prefHeight="371.0" prefWidth="600.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0" />
-                     </children></AnchorPane>
               </content>
-            </Tab>
-            <Tab text="Statistiken">
-               <content>
-                  <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
-               </content>
             </Tab>
         </tabs>
       </TabPane>

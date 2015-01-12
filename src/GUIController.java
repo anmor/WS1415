@@ -12,6 +12,8 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.BarChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -62,7 +64,13 @@ public class GUIController implements Initializable {
 	private ComboBox<Double> minSup, minConf;
 
 	@FXML
-	private BarChart<?, ?> diagramm;
+	private ComboBox<String> kategorie, limitierung;
+
+	@FXML
+	private BarChart<String, Number> diagramm;
+
+	@FXML
+	private NumberAxis yAxe;
 
 	List<String> dateiinhalt = new ArrayList<String>();
 
@@ -96,6 +104,7 @@ public class GUIController implements Initializable {
 			return;
 		}
 		lesen.setText("Datei erfolgreich gelesen.");
+
 		//-- Hoehe/Breite/Daten/Waren ermitteln --
 		int groessen[] = inhalt.hoehebreite(dateiinhalt);
 		int waren = 0, daten = 0, hoehe = 0, breite = 0;
@@ -103,18 +112,6 @@ public class GUIController implements Initializable {
 		breite = groessen[1];
 		waren = groessen[2];
 		daten = groessen[3];
-
-		LinkedList<String> namen = new LinkedList<String>();
-		namen = inhalt.namenErmitteln(dateiinhalt, breite);
-
-		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
-		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
-
-		for (int i = 0; i < werte.size(); i++) {
-			for (String wert : werte.get(i).keySet()) {
-				System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
-			}
-		}
 
 		//- Testausgabe -
 		System.out.println("Waren: " + waren);
@@ -132,12 +129,99 @@ public class GUIController implements Initializable {
 				TableColumn<Map, String> column = new TableColumn<>(spaltennamen[i]);
 				column.setCellValueFactory(new MapValueFactory(mapKey));
 				tabelle.getColumns().add(column);
+
 			}
 			tabelle.setItems(inhalt.tabellenInhalt(dateiinhalt, breite));
 		}
-		// auswertung.setDisable(false); // nullpointer warum?
 
-		//minSup.setItems(FXCollections.observableArrayList());
+		//-- Kategorisierung --
+		LinkedList<String> namen = new LinkedList<String>();
+		namen = inhalt.namenErmitteln(dateiinhalt, breite);
+
+		//- Statistik-ComboBox mit Kategorien füllen - 
+		ObservableList<String> kategorieListe = FXCollections.observableArrayList();
+		//		for (int i = 0; i < namen.size(); i++) {
+		//			if (i >= waren) {
+		//				kategorieListe.add(namen.get(i));
+		//			}
+		//		}
+		kategorieListe.add("Informationen zur Person");
+		kategorieListe.add("Gekaufte Waren");
+		kategorieListe.add(namen.getLast());
+		kategorie.setItems(kategorieListe);
+
+		//-- Einschraenkungen --
+		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
+		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
+
+		//- Einschraenkungen-ComboBox mit Kategorien füllen -
+		//werte.get(i) fuer i=daten bis	breite
+		ObservableList<String> limitListe = FXCollections.observableArrayList();
+		for (int i = waren; i < breite; i++) {
+			for (String wert : werte.get(i).keySet()) {
+				limitListe.add(wert);
+			}
+		}
+		limitierung.setItems(limitListe);
+
+	}
+
+	@FXML
+	private void statistik(ActionEvent event) {
+		InhaltVerwaltung inhalt = new InhaltVerwaltung();
+
+		//-- Hoehe/Breite/Daten/Waren ermitteln --
+		int groessen[] = inhalt.hoehebreite(dateiinhalt);
+		int waren = 0, daten = 0, hoehe = 0, breite = 0;
+		hoehe = groessen[0];
+		breite = groessen[1];
+		waren = groessen[2];
+		daten = groessen[3];
+
+		LinkedList<String> namen = new LinkedList<String>();
+		namen = inhalt.namenErmitteln(dateiinhalt, breite);
+
+		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
+		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
+
+		//-- Statistik darstellen --
+		diagramm.getData().clear();
+		for (int i = 0; i < werte.size(); i++) {
+			for (String wert : werte.get(i).keySet()) {
+				System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
+				if (kategorie.getValue() != null) {
+					XYChart.Series datensatz = new XYChart.Series();
+
+					//- Summe der zusammengekauten Waren -
+					if (kategorie.getValue().equals("Warensumme") && (i == werte.size() - 1)) {
+						datensatz.getData().add(new XYChart.Data(wert, werte.get(i).get(wert)));
+						diagramm.setTitle("Menge der zusammen gekauften Waren");
+						yAxe.setLabel("Anzahl");
+						datensatz.setName(wert);
+						diagramm.getData().add(datensatz);
+					}
+
+					//- Informationen zu den Peronen -
+					if ((kategorie.getValue().equals("Informationen zur Person") && (i > waren) && (i < werte.size() - 1))) {
+						double prozent = (double) werte.get(i).get(wert) / hoehe;
+						datensatz.getData().add(new XYChart.Data(wert, prozent));
+						diagramm.setTitle("Prozentuale darstellung der persönlichen Informationen");
+						yAxe.setLabel("Prozent");
+						datensatz.setName(namen.get(i) + " " + wert);
+						diagramm.getData().add(datensatz);
+					}
+
+					//- Übersicht der Waren -
+					if ((kategorie.getValue().equals("Gekaufte Waren")) && (i <= waren) && (wert.equals("1"))) {
+						datensatz.getData().add(new XYChart.Data(namen.get(i), werte.get(i).get(wert)));
+						diagramm.setTitle("Anzahl der gekauften Waren");
+						yAxe.setLabel("Anzahl");
+						datensatz.setName(namen.get(i));
+						diagramm.getData().add(datensatz);
+					}
+				}
+			}
+		}
 	}
 
 	@FXML
@@ -159,29 +243,22 @@ public class GUIController implements Initializable {
 		int groessen[] = inhalt.hoehebreite(dateiinhalt);
 		int waren = 0, daten = 0, hoehe = 0, breite = 0;
 		int hoeheTatsaechlich = 0;
-		hoehe = groessen[0];
-		breite = groessen[1];
-		waren = groessen[2];
-		daten = groessen[3];
+		hoehe = groessen[0];	// = 814
+		breite = groessen[1];	// = 15
+		waren = groessen[2];	// = 10
+		daten = groessen[3]; 	// = 5
 
 		//-- Array mit Werten fuellen. --
 		String inhalte[][] = new String[hoehe][breite];
-		hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, 0, "Male");
-		//hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten,-1,"");
 
-		LinkedList<String> namen = new LinkedList<String>();
-		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
-
-		namen = inhalt.namenErmitteln(dateiinhalt, breite);
-		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
-
-		for (int i = daten; i <= breite; i++) {
-			for (String wert : werte.get(i).keySet()) {
-				System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
-			}
-
+		if (limitierung.getValue() == null) {
+			hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, -1, "");
+		} else {
+			String limit = limitierung.getValue();
+			hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, 0, limit);
 		}
 
+		System.out.println("Höhe: " + hoeheTatsaechlich);
 		//- Testausgabe -
 		//		int a = 0;
 		//		System.out.println("Elemente im Array: ");
@@ -206,14 +283,13 @@ public class GUIController implements Initializable {
 			minConfWert = (Double) minConf.getValue();
 		}
 
-		//- Testausgabe -
-		System.out.println("MinSup: " + minSupWert + " und MinConf: " + minConfWert);
-
 		//--- Regeln auf den Datensatz anwenden ---
 		LinkedList<LinkedList<LinkedList<Integer>>> regeln = new LinkedList<LinkedList<LinkedList<Integer>>>();
 		regeln = inhalt.apriori(inhalte, minSupWert, minConfWert, hoeheTatsaechlich, waren);
 
 		//-- Liste der gefundenen Regeln darstellen -- 
+		LinkedList<String> namen = new LinkedList<String>();
+		namen = inhalt.namenErmitteln(dateiinhalt, breite);
 		ObservableList<String> rListe = FXCollections.observableArrayList();
 		rListe.add("Anhand der Einstellungen treffen " + regeln.size() + " Regeln zu.");
 		for (int i = 0; i < regeln.size(); i++) {
@@ -222,24 +298,23 @@ public class GUIController implements Initializable {
 			double sup = ((double) regeln.get(i).get(3).get(0) / (double) hoeheTatsaechlich);
 			sup = Math.round(sup * 100);
 			String rListeString = new String("Sup: " + sup / 100);
-			if (sup%10==0) {
-				rListeString = rListeString + "0";				
+			if (sup % 10 == 0) {
+				rListeString = rListeString + "0";
 			}
 			rListeString = rListeString + " Conf: " + conf / 100;
-			if (conf%10==0) {
-				rListeString = rListeString + "0";				
+			if (conf % 10 == 0) {
+				rListeString = rListeString + "0";
 			}
 			rListeString = rListeString + " [ ";
-			for (int j = 0;j < regeln.get(i).get(0).size();j++) {
+			for (int j = 0; j < regeln.get(i).get(0).size(); j++) {
 				rListeString = rListeString + "'" + namen.get(regeln.get(i).get(0).get(j)) + "' ";
 			}
 			rListeString = rListeString + "] -> [ ";
-			for (int j = 0;j < regeln.get(i).get(1).size();j++) {
+			for (int j = 0; j < regeln.get(i).get(1).size(); j++) {
 				rListeString = rListeString + "'" + namen.get(regeln.get(i).get(1).get(j)) + "' ";
 			}
 			rListeString = rListeString + "]";
 			rListe.add(rListeString);
-//			rListe.add(regeln.get(i).get(0) + " -> " + regeln.get(i).get(1) + " Sup: " + sup / 100  + " Conf: " + conf / 100);
 		}
 		regelListe.setItems(rListe);
 
