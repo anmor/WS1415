@@ -138,7 +138,7 @@ public class GUIController implements Initializable {
 		LinkedList<String> namen = new LinkedList<String>();
 		namen = inhalt.namenErmitteln(dateiinhalt, breite);
 
-		//- Statistik-ComboBox mit Kategorien füllen - 
+		//- Statistik-ComboBox mit Kategorien fï¿½llen - 
 		ObservableList<String> kategorieListe = FXCollections.observableArrayList();
 		//		for (int i = 0; i < namen.size(); i++) {
 		//			if (i >= waren) {
@@ -154,12 +154,12 @@ public class GUIController implements Initializable {
 		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
 		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
 
-		//- Einschraenkungen-ComboBox mit Kategorien füllen -
+		//- Einschraenkungen-ComboBox mit Kategorien fï¿½llen -
 		//werte.get(i) fuer i=daten bis	breite
 		ObservableList<String> limitListe = FXCollections.observableArrayList();
 		for (int i = waren; i < breite; i++) {
 			for (String wert : werte.get(i).keySet()) {
-				limitListe.add(wert);
+				limitListe.add(namen.get(i) + ": " +wert);
 			}
 		}
 		limitierung.setItems(limitListe);
@@ -205,13 +205,13 @@ public class GUIController implements Initializable {
 					if ((kategorie.getValue().equals("Informationen zur Person") && (i > waren) && (i < werte.size() - 1))) {
 						double prozent = (double) werte.get(i).get(wert) / hoehe;
 						datensatz.getData().add(new XYChart.Data(wert, prozent));
-						diagramm.setTitle("Prozentuale darstellung der persönlichen Informationen");
+						diagramm.setTitle("Prozentuale darstellung der persï¿½nlichen Informationen");
 						yAxe.setLabel("Prozent");
 						datensatz.setName(namen.get(i) + " " + wert);
 						diagramm.getData().add(datensatz);
 					}
 
-					//- Übersicht der Waren -
+					//- ï¿½bersicht der Waren -
 					if ((kategorie.getValue().equals("Gekaufte Waren")) && (i <= waren) && (wert.equals("1"))) {
 						datensatz.getData().add(new XYChart.Data(namen.get(i), werte.get(i).get(wert)));
 						diagramm.setTitle("Anzahl der gekauften Waren");
@@ -254,11 +254,22 @@ public class GUIController implements Initializable {
 		if (limitierung.getValue() == null) {
 			hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, -1, "");
 		} else {
-			String limit = limitierung.getValue();
-			hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, 0, limit);
+			String limit[] = limitierung.getValue().split(": ");
+			int datenFeld = -1;
+			for (int i = 0;i < daten;i++) {
+				LinkedList<String> namen = new LinkedList<String>();
+				namen = inhalt.namenErmitteln(dateiinhalt, breite);
+
+				if (namen.get(waren+i).equals(limit[0])) {
+					datenFeld = i;
+				}
+				System.out.println(datenFeld + " " + limit[1]);
+
+			}
+			hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, datenFeld, limit[1]);
 		}
 
-		System.out.println("Höhe: " + hoeheTatsaechlich);
+		System.out.println("Hï¿½he: " + hoeheTatsaechlich);
 		//- Testausgabe -
 		//		int a = 0;
 		//		System.out.println("Elemente im Array: ");
