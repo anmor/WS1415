@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
+<?import javafx.scene.paint.*?>
 <?import javafx.scene.chart.*?>
 <?import javafx.scene.control.*?>
 <?import java.lang.*?>
@@ -56,13 +58,16 @@
                               </AnchorPane>
                               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="160.0" prefWidth="100.0">
                                  <children>
-                                    <BarChart fx:id="diagramm" depthTest="ENABLE" legendSide="TOP" nodeOrientation="LEFT_TO_RIGHT" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                    <BarChart fx:id="diagramm" animated="false" barGap="2.0" categoryGap="0.0" legendSide="TOP" snapToPixel="false" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                       <xAxis>
-                                        <CategoryAxis animated="false" cacheShape="false" focusTraversable="true" scaleShape="false" />
+                                        <CategoryAxis animated="false" snapToPixel="false" />
                                       </xAxis>
                                       <yAxis>
-                                        <NumberAxis fx:id="yAxe" />
+                                        <NumberAxis fx:id="yAxe" animated="false" snapToPixel="false" />
                                       </yAxis>
+                                       <rotationAxis>
+                                          <Point3D />
+                                       </rotationAxis>
                                     </BarChart>
                                  </children>
                               </AnchorPane>

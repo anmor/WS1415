@@ -223,7 +223,7 @@ public class InhaltVerwaltung {
 		return regeln;
 	}
 
-	//--- Ermittle die Ueberschriften
+	//--- Ermittle die Ueberschriften ---
 	public LinkedList<String> namenErmitteln(List<String> dateiinhalt, int breite) {
 		LinkedList<String> namen = new LinkedList<String>();
 
@@ -237,7 +237,7 @@ public class InhaltVerwaltung {
 			if (information.startsWith("0,") || information.startsWith("1,")) {
 				String x[] = vorzeile.split(",");
 
-				//- Pruefe ob der Datensatz vollst�ndig ist. -
+				//- Pruefe ob der Datensatz vollstaendig ist. -
 				if (x.length != breite) {
 					System.out.println(information);
 					System.out.println("Falscher Datensatz");
@@ -271,7 +271,7 @@ public class InhaltVerwaltung {
 			if (information.startsWith("0") || information.startsWith("1")) {
 				String x[] = information.split(",");
 
-				//- Pruefe ob der Datensatz vollst�ndig ist. -
+				//- Pruefe ob der Datensatz vollstaendig ist. -
 				if (x.length != breite) {
 					System.out.println(information);
 					System.out.println("Falscher Datensatz");
@@ -404,8 +404,8 @@ public class InhaltVerwaltung {
 			String output = null;
 			List<String> dateiinhalt = new ArrayList<String>();
 
-			//- Testausgabe -
-			System.out.println("Eingelesene Inhalte: ");
+			//			//- Testausgabe -
+			//			System.out.println("Eingelesene Inhalte: ");
 
 			//-- Speicher den gesammten Dateiinhalt als Liste --
 			while ((output = input.readLine()) != null) {

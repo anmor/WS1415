@@ -100,7 +100,6 @@ public class GUIController implements Initializable {
 			lesen.setText("Datei existiert nicht!");
 			tabelle.setPlaceholder(new Label("Keine Inhalte vorhanden"));
 			diagramm.setVisible(false);
-			//auswertung.setDisable(true); // nullpointer warum?
 			return;
 		}
 		lesen.setText("Datei erfolgreich gelesen.");
@@ -138,7 +137,7 @@ public class GUIController implements Initializable {
 		LinkedList<String> namen = new LinkedList<String>();
 		namen = inhalt.namenErmitteln(dateiinhalt, breite);
 
-		//- Statistik-ComboBox mit Kategorien f�llen - 
+		//- Statistik-ComboBox mit Kategorien fuellen - 
 		ObservableList<String> kategorieListe = FXCollections.observableArrayList();
 		//		for (int i = 0; i < namen.size(); i++) {
 		//			if (i >= waren) {
@@ -154,12 +153,12 @@ public class GUIController implements Initializable {
 		LinkedList<HashMap<String, Integer>> werte = new LinkedList<HashMap<String, Integer>>();
 		werte = inhalt.werteErmitteln(dateiinhalt, breite, waren);
 
-		//- Einschraenkungen-ComboBox mit Kategorien f�llen -
+		//- Einschraenkungen-ComboBox mit Kategorien fuellen -
 		//werte.get(i) fuer i=daten bis	breite
 		ObservableList<String> limitListe = FXCollections.observableArrayList();
 		for (int i = waren; i < breite; i++) {
 			for (String wert : werte.get(i).keySet()) {
-				limitListe.add(namen.get(i) + ": " +wert);
+				limitListe.add(namen.get(i) + ": " + wert);
 			}
 		}
 		limitierung.setItems(limitListe);
@@ -169,6 +168,15 @@ public class GUIController implements Initializable {
 	@FXML
 	private void statistik(ActionEvent event) {
 		InhaltVerwaltung inhalt = new InhaltVerwaltung();
+
+		if ((kategorie.getValue() == null) || (dateiinhalt == null)) {
+			return;
+		}
+
+		//- Diagramm darstellen -
+		if (diagramm.isVisible() == false) {
+			diagramm.setVisible(true);
+		}
 
 		//-- Hoehe/Breite/Daten/Waren ermitteln --
 		int groessen[] = inhalt.hoehebreite(dateiinhalt);
@@ -188,37 +196,35 @@ public class GUIController implements Initializable {
 		diagramm.getData().clear();
 		for (int i = 0; i < werte.size(); i++) {
 			for (String wert : werte.get(i).keySet()) {
-				System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
-				if (kategorie.getValue() != null) {
-					XYChart.Series datensatz = new XYChart.Series();
+				//System.out.println(namen.get(i) + " " + wert + " " + werte.get(i).get(wert));
+				XYChart.Series datensatz = new XYChart.Series();
 
-					//- Summe der zusammengekauten Waren -
-					if (kategorie.getValue().equals("Warensumme") && (i == werte.size() - 1)) {
-						datensatz.getData().add(new XYChart.Data(wert, werte.get(i).get(wert)));
-						diagramm.setTitle("Menge der zusammen gekauften Waren");
-						yAxe.setLabel("Anzahl");
-						datensatz.setName(wert);
-						diagramm.getData().add(datensatz);
-					}
+				//- Summe der zusammengekauten Waren -
+				if (kategorie.getValue().equals("Warensumme") && (i == werte.size() - 1)) {
+					datensatz.getData().add(new XYChart.Data(wert, werte.get(i).get(wert)));
+					diagramm.setTitle("Menge der zusammen gekauften Waren");
+					yAxe.setLabel("Anzahl");
+					datensatz.setName(wert);
+					diagramm.getData().add(datensatz);
+				}
 
-					//- Informationen zu den Peronen -
-					if ((kategorie.getValue().equals("Informationen zur Person") && (i > waren) && (i < werte.size() - 1))) {
-						double prozent = (double) werte.get(i).get(wert) / hoehe;
-						datensatz.getData().add(new XYChart.Data(wert, prozent));
-						diagramm.setTitle("Prozentuale darstellung der pers�nlichen Informationen");
-						yAxe.setLabel("Prozent");
-						datensatz.setName(namen.get(i) + " " + wert);
-						diagramm.getData().add(datensatz);
-					}
+				//- Informationen zu den Peronen -
+				if ((kategorie.getValue().equals("Informationen zur Person") && (i > waren) && (i < werte.size() - 1))) {
+					double prozent = (double) werte.get(i).get(wert) / hoehe;
+					datensatz.getData().add(new XYChart.Data(wert, prozent));
+					diagramm.setTitle("Informationen zu den einkaufenden Personen");
+					yAxe.setLabel("Prozent");
+					datensatz.setName(namen.get(i) + ": " + wert);
+					diagramm.getData().add(datensatz);
+				}
 
-					//- �bersicht der Waren -
-					if ((kategorie.getValue().equals("Gekaufte Waren")) && (i <= waren) && (wert.equals("1"))) {
-						datensatz.getData().add(new XYChart.Data(namen.get(i), werte.get(i).get(wert)));
-						diagramm.setTitle("Anzahl der gekauften Waren");
-						yAxe.setLabel("Anzahl");
-						datensatz.setName(namen.get(i));
-						diagramm.getData().add(datensatz);
-					}
+				//- Uebersicht der Waren -
+				if ((kategorie.getValue().equals("Gekaufte Waren")) && (i <= waren) && (wert.equals("1"))) {
+					datensatz.getData().add(new XYChart.Data(namen.get(i), werte.get(i).get(wert)));
+					diagramm.setTitle("Anzahl der gekauften Waren");
+					yAxe.setLabel("Anzahl");
+					datensatz.setName(namen.get(i));
+					diagramm.getData().add(datensatz);
 				}
 			}
 		}
@@ -232,21 +238,16 @@ public class GUIController implements Initializable {
 			return;
 		}
 
-		//- Diagramm darstellen -
-		if (diagramm.isVisible() == false) {
-			diagramm.setVisible(true);
-		}
-
 		InhaltVerwaltung inhalt = new InhaltVerwaltung();
 
 		//-- Hoehe/Breite/Daten/Waren ermitteln --
 		int groessen[] = inhalt.hoehebreite(dateiinhalt);
 		int waren = 0, daten = 0, hoehe = 0, breite = 0;
 		int hoeheTatsaechlich = 0;
-		hoehe = groessen[0];	// = 814
-		breite = groessen[1];	// = 15
-		waren = groessen[2];	// = 10
-		daten = groessen[3]; 	// = 5
+		hoehe = groessen[0];
+		breite = groessen[1];
+		waren = groessen[2];
+		daten = groessen[3];
 
 		//-- Array mit Werten fuellen. --
 		String inhalte[][] = new String[hoehe][breite];
@@ -256,11 +257,11 @@ public class GUIController implements Initializable {
 		} else {
 			String limit[] = limitierung.getValue().split(": ");
 			int datenFeld = -1;
-			for (int i = 0;i < daten;i++) {
+			for (int i = 0; i < daten; i++) {
 				LinkedList<String> namen = new LinkedList<String>();
 				namen = inhalt.namenErmitteln(dateiinhalt, breite);
 
-				if (namen.get(waren+i).equals(limit[0])) {
+				if (namen.get(waren + i).equals(limit[0])) {
 					datenFeld = i;
 				}
 				System.out.println(datenFeld + " " + limit[1]);
@@ -268,20 +269,6 @@ public class GUIController implements Initializable {
 			}
 			hoeheTatsaechlich = inhalt.inhalteUebergeben(dateiinhalt, breite, inhalte, waren, daten, datenFeld, limit[1]);
 		}
-
-		System.out.println("H�he: " + hoeheTatsaechlich);
-		//- Testausgabe -
-		//		int a = 0;
-		//		System.out.println("Elemente im Array: ");
-		//		for (int i = 0; i < hoeheTatsaechlich; i++) {
-		//			for (int j = 0; j < breite; j++) {
-		//				System.out.print(inhalte[i][j] + " ");
-		//			}
-		//			System.out.println("");
-		//			a = i;
-		//		}
-		//		a++; // wegen nullten Eintrag.
-		//		System.out.println("Es gibt " + a + " Eintraege.");
 
 		//- Sup und Conf Werte zuweisen -
 		Double minSupWert = new Double(0.20);
